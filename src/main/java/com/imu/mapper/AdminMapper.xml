@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.AdminDAO" >
+	<resultMap id="bean" type="com.imu.entity.Admin" >
+	   <id column="id" property="id"/>
+	   <result column="name" property="name"/>
+	   <result column="password" property="password"/>
+	</resultMap>
+	   <resultMap id="user" type="com.imu.entity.User" >
+	   <id column="id" property="id"/>
+	   <result column="name" property="name"/>
+	   <result column="password" property="password"/>
+	</resultMap>
+	<sql id="columns" >
+	  	id, name, password
+	</sql>
+	<select id="login"  resultMap="user">
+	   select 
+	   <include refid="columns" />
+	   from admin
+	   where id = #{u.id} and password = #{u.password}
+	</select>
+	<select id="getAdminById" resultMap="bean">
+		select
+		<include refid="columns"></include>
+		from
+		admin a
+		where
+		a.id = #{id}
+	</select>
+	<insert id="add">
+		insert into 
+		admin
+		(
+			id,name,password
+		)
+		values
+		(
+			#{u.id},
+			#{u.name},
+			#{u.password}
+		)
+	</insert>
+	<select id="getByKeyCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM admin where admin.name LIKE '%${key}%' or admin.id LIKE '%${key}%';
+	</select>
+	<select id="getByKey" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM admin a where a.name LIKE '%${key}%' or a.id LIKE '%${key}%'
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<update id="resetPwd">
+		update admin set password=#{u.password} where id=#{u.id}
+	</update>
+	<delete id="delete">
+		delete from admin where id=#{id};
+	</delete>
+</mapper>

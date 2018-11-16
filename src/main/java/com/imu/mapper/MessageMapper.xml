@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.MessageDAO" >
+	<resultMap id="bean" type="com.imu.entity.Message" >
+	  <id column="id" property="id"/>
+	  <result column="title" property="title"/>
+	  <result column="topic_id" property="topicId"/>
+	  <result column="type" property="type"/>
+	  <result column="stage" property="stage"/>
+	  <result column="description" property="description"/>
+	  <result column="content" property="content"/>
+	  <result column="receive_id" property="receiveId"/>
+	  <result column="send_id" property="sendId"/>
+	  <result column="time" property="time"/>
+	</resultMap>
+	<sql id="columns" >
+	  id, title, topic_id, type, stage, description, content, receive_id, send_id, time
+	</sql>
+	<insert id="add" useGeneratedKeys="true" keyProperty="msg.id">
+		INSERT INTO message(title,topic_id,type, stage, description, content, receive_id, send_id, time) 
+		VALUES(
+			#{msg.title},
+			#{msg.topicId},
+			#{msg.type},
+			#{msg.stage},
+			#{msg.description},
+			#{msg.content},
+			#{msg.receiveId},
+			#{msg.sendId},
+			#{msg.time}	
+		)
+	</insert>
+	<select id="getMessageList" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM message
+		WHERE 1=1
+		<if test="param.receiveId!=null and param.receiveId !=''"> 
+			AND receive_id = #{param.receiveId}
+		</if>
+		<if test="param.sendId!=null and param.sendId !=''"> 
+			AND send_id = #{param.sendId}
+		</if>
+		<if test="param.topicId!=null and param.topicId !=''"> 
+			AND topic_id = #{param.topicId}
+		</if>
+		<if test="param.stage!=0"> 
+			AND stage = #{param.stage}
+		</if>
+		<if test="param.type!=0"> 
+			AND type = #{param.type}
+		</if>
+		
+	</select>
+</mapper>

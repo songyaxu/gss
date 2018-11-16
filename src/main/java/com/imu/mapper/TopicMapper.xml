@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.TopicDAO" >
+	<resultMap id="bean" type="com.imu.entity.Topic" >
+	  <id column="id" property="id"/>
+	  <result column="title" property="title"/>
+	  <result column="content" property="content"/>
+	  <result column="description" property="description"/>
+	  <result column="teacher_id" property="teacherId"/>
+	  <result column="student_id" property="studentId"/>
+	  <result column="secretary_id" property="secretaryId"/>
+	  <result column="valid" property="valid"/>
+	  <result column="status" property="status"/>
+	  <result column="is_open" property="isOpen"/>
+	  <result column="is_finished" property="isFinished"/>
+	  <result column="attachment" property="attachment"/>
+	  <result column="proposal" property="proposal"/>
+	  <result column="medium_defense" property="mediumDefense"/>
+	  <result column="thesis" property="thesis"/>
+	  <result column="code" property="code"/>
+	  <result column="record" property="record"/>
+	  <result column="time" property="time"/>
+	</resultMap>
+	<sql id="columns" >
+	  id, title, content,description,
+	  teacher_id,student_id,secretary_id,valid,
+	  status,is_open,is_finished,proposal,attachment,
+	  medium_defense,thesis,code,record,time
+	</sql>
+	<select id="getByKeyCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM topic where topic.title LIKE '%${key}%';
+	</select>
+	<select id="getSecretaryCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM topic where topic.secretary_id = #{id};
+	</select>
+	<select id="getSecretaryTopic" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM topic a where a.secretary_id=#{id}
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<select id="getTeacherCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM topic where topic.teacher_id = #{id};
+	</select>
+	<select id="getStudentCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM topic where topic.student_id = #{id};
+	</select>
+	<select id="getByKey" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM topic a where a.title LIKE '%${key}%'
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<select id="getMyTopic" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM topic a where a.teacher_id=#{id}
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<select id="getMyTopicCount" resultType="int">
+		SELECT COUNT(0)
+		FROM topic a where a.teacher_id=#{id}
+	</select>
+	<insert id="add" useGeneratedKeys="true" keyProperty="t.id">
+		INSERT INTO
+		topic 
+		(
+			title,content,description,
+			teacher_id,student_id,secretary_id,
+			valid,status,is_open,is_finished,
+			attachment,proposal,medium_defense,
+			thesis,code,record,time
+		)
+		VALUES
+		(
+			#{t.title},#{t.content},#{t.description},
+			#{t.teacherId},#{t.studentId},#{t.secretaryId},
+			#{t.valid},#{t.status},#{t.isOpen},#{t.isFinished},
+			#{t.attachment},#{t.proposal},#{t.mediumDefense},
+			#{t.thesis},#{t.code},#{t.record},#{t.time}
+		)
+	</insert>
+	<select id="get" resultMap="bean">
+		SELECT <include refid="columns"></include>
+		FROM topic 
+		WHERE id = #{id}
+	</select>
+	<update id="update">
+		update topic 
+		set id=#{t.id}
+		<if test="t.title != null">,title=#{t.title}</if>
+		<if test="t.content != null">,content=#{t.content}</if>
+		<if test="t.description != null">,description=#{t.description}</if>
+		<if test="t.studentId != null">,student_id=#{t.studentId}</if>
+		<if test="t.secretaryId != null">,secretary_id=#{t.secretaryId}</if>
+		<if test="t.status != 0">,status=#{t.status}</if>
+		<if test="t.isOpen != 0">,is_open=#{t.isOpen}</if>
+		<if test="t.isFinished != 0">,is_finished=#{t.isFinished}</if>
+		<if test="t.attachment != 0">,attachment=#{t.attachment}</if>
+		<if test="t.proposal != 0">,proposal=#{t.proposal}</if>
+		<if test="t.mediumDefense != 0">,medium_defense=#{t.mediumDefense}</if>
+		<if test="t.thesis != 0">,thesis=#{t.thesis}</if>
+		<if test="t.code != 0">,code=#{t.code}</if>
+		<if test="t.record != null">,record=#{t.record}</if>
+		where id = #{t.id}
+	</update>
+	<update id="endStage">
+		update topic
+		set status = status+1
+		where id  = #{id}
+	</update>
+	
+</mapper>

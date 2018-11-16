@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.FileDAO" >
+	<resultMap id="bean" type="com.imu.entity.File" >
+	  <id column="id" property="id"/>
+	  <result column="title" property="title"/>
+	  <result column="file_name" property="fileName"/>
+	  <result column="location" property="location"/>
+	  <result column="time" property="time"/>
+	</resultMap>
+	<sql id="columns" >
+	  id, title, file_name, location,time
+	</sql>
+	<insert id="add" useGeneratedKeys="true" keyProperty="file.id">
+		INSERT INTO file(title,file_name,location,time) 
+		VALUES(
+			#{file.title},
+			#{file.fileName},
+			#{file.location},
+			#{file.time}		
+		)
+	</insert>
+	<select id="getFileById" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM file 
+		WHERE id=#{id}
+	</select>
+</mapper>

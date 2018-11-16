@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.TeacherDAO" >
+  <resultMap id="bean" type="com.imu.entity.Teacher" >
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="password" property="password"/>
+    <result column="gender" property="gender"/>
+    <result column="email" property="email"/>
+    <result column="phone" property="phone"/>
+    <result column="type" property="type"/>
+    <result column="last_login_time" property="lastLoginTime"/>
+  </resultMap>
+  <resultMap type="com.imu.entity.User" id="user">
+  	 <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="password" property="password"/>
+  </resultMap>
+  <sql id="columns" >
+    id, name, password,gender,email,phone,type,last_login_time
+  </sql>
+   <select id="login"  resultMap="user">
+    select 
+    id,name,password
+    from teacher
+    where id = #{u.id} and password = #{u.password}
+  </select>
+  <select id="isTeacher" resultMap="bean">
+  	select 
+  	<include refid="columns"></include>
+  	from teacher
+  	where id=#{id} and type=0
+  </select>
+  <update id="update">
+  	update teacher set
+		id=#{u.id}
+		<if test="u.gender != null">
+			,gender=#{u.gender}
+		</if>
+		<if test="u.name != null and u.name!=''">
+			,name=#{u.name}
+		</if>
+		<if test="u.password != null and u.password!=''">
+			,password=#{u.password}
+		</if>
+		<if test="u.phone != null and u.phone != ''">
+			,phone=#{u.phone}
+		</if>
+		<if test="u.email != null and u.email!=''">
+			,email=#{u.email}
+		</if>
+		<if test="a==1">
+			,type=#{u.type}
+		</if>
+		<if test="u.lastLoginTime != null and u.lastLoginTime!=''">
+			,last_login_time=#{u.lastLoginTime}
+		</if>
+		WHERE
+		id=#{u.id}
+  </update>
+  	<select id="getTeacherById" resultMap="bean">
+		SELECT
+		<include refid="columns"></include>
+		FROM
+		teacher a
+		WHERE
+		a.id = #{id}
+	</select>
+	<select id="getSecretaryById" resultMap="bean">
+		SELECT
+		<include refid="columns"></include>
+		FROM
+		teacher a
+		WHERE a.type=1 and
+		a.id = #{id}
+	</select>
+	<insert id="add">
+		insert into 
+		teacher
+		(
+			id,name,password
+		)
+		values
+		(
+			#{u.id},
+			#{u.name},
+			#{u.password}
+		)
+	</insert>
+	 <select id="getByKeyCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM teacher where teacher.name LIKE '%${key}%' or teacher.id LIKE '%${key}%';
+	</select>
+	<select id="getByKey" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM teacher a where a.name LIKE '%${key}%' or a.id LIKE '%${key}%'
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<update id="resetPwd">
+		update teacher set password=#{u.password} where id=#{u.id}
+	</update>
+	<delete id="delete">
+		delete from teacher where id=#{id};
+	</delete>
+</mapper>

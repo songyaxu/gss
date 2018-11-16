@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imu.dao.StudentDAO" >
+  <resultMap id="bean" type="com.imu.entity.Student" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="major" property="major" jdbcType="VARCHAR" />
+    <result column="dept" property="dept" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  <resultMap type="com.imu.entity.User" id="user">
+  	 <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columns" >
+    id, name, password,gender,email,phone,major,dept,status,last_login_time
+  </sql>
+   <select id="login"  resultMap="user" parameterType="com.imu.entity.User">
+    select 
+  	id,name,password
+    from student
+    where id = #{id,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
+  </select>
+  <update id="update">
+  	update student set id=#{u.id}
+		<if test="u.gender != null">,gender=#{u.gender}</if>
+		<if test="u.lastLoginTime != null">,last_login_time=#{u.lastLoginTime,jdbcType=TIMESTAMP}</if>
+		<if test="u.name != null and u.name!=''">,name=#{u.name}</if>
+		<if test="u.password != null and u.password!=''">,password=#{u.password}</if>
+		<if test="u.phone != null and u.phone != ''">,phone=#{u.phone}</if>
+		<if test="u.email != null and u.email!=''">,email=#{u.email}</if>
+		<if test="u.major != null and u.major!=''">,major=#{u.major}</if>
+		<if test="u.dept != null and u.dept!=''">,dept=#{u.dept}</if>
+		<if test="u.status != null and u.status!=''">,status=#{u.status}</if>
+		where id=#{u.id}
+  </update>
+  <update id="updateStatusAddOne">
+  	update student set status = status+1
+  	where id =#{id}
+  </update>
+  <select id="get"  resultMap="bean">
+    select 
+  	<include refid="columns"></include>
+    from student
+    where id = #{id}
+  </select>
+  <insert id="add">
+  	insert into 
+		student
+		(
+			id,name,password
+		)
+		values
+		(
+			#{u.id},
+			#{u.name},
+			#{u.password}
+		)
+  </insert>
+  <select id="getByKeyCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM student where student.name LIKE '%${key}%' or student.id LIKE '%${key}%';
+	</select>
+	<select id="getByKey" resultMap="bean">
+		SELECT 
+		<include refid="columns"></include>
+		FROM student a where a.name LIKE '%${key}%' or a.id LIKE '%${key}%'
+		LIMIT  #{page.beginIndex},#{page.pageSize} ;
+	</select>
+	<update id="resetPwd">
+		update student set password=#{u.password} where id=#{u.id}
+	</update>
+	<select id="getStatusCount" resultType="int">
+		SELECT COUNT(0) 
+		FROM student where student.status=#{status};
+	</select>
+	<delete id="delete">
+		delete from student where id=#{id};
+	</delete>
+	<update id="updateStatus">
+		update student set status=#{u.status}
+		where id = #{u.id}
+	</update>
+</mapper>
